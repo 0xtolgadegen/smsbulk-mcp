@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+// Refuses a commit message that names a word this public repository must
+// not carry. The words are not written here, only the SHA-256 of their
+// normalized form (lower case, letters and digits only), so the hook does
+// not publish what it guards. The message is normalized the same way and
+// every window of each listed length is compared, which also catches the
+// word written with spaces, hyphens or different case.
+//
+// Enable once per clone: git config core.hooksPath .githooks
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+
+const BLOCKED = [
+  [7, "e5a507959a0c206ad2dafe4885c2464ef479ccf8a0d2c9e98db3f7966c3ab09c"],
+  [12, "2a28a3d7ca4111f352b14f0f9857bd4d9bb4bed7c1b07ad2ecc236af086e8bf4"],
+  [10, "0df04f1db67da3b47511f44b627ad2573cac494e5e851daf859a5165771b9e74"],
+];
+
+const raw = readFileSync(process.argv[2], "utf8");
+const text = raw
+  .split("\n")
+  .filter((line) => !line.startsWith("#"))
+  .join("\n")
+  .toLowerCase()
+  .replace(/[^a-z0-9]/g, "");
+
+for (const [len, hash] of BLOCKED) {
+  for (let i = 0; i + len <= text.length; i++) {
+    const window = text.slice(i, i + len);
+    if (createHash("sha256").update(window).digest("hex") === hash) {
+      process.stderr.write(
+        "commit-msg: this message names an internal word that must not appear in this public repository. Reword it and commit again.\n",
+      );
+      process.exit(1);
+    }
+  }
+}
