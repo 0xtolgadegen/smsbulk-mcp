@@ -5,6 +5,10 @@
   "type": "module",
   "license": "MIT",
   "homepage": "https://smsbulk.net",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xtolgadegen/smsbulk-mcp.git"
+  },
   "bin": {
     "smsbulk-mcp": "dist/index.js"
   },
@@ -29,6 +33,10 @@
     "sms",
     "sms-verification",
     "email-verification",
+    "sms-activate-alternative",
+    "virtual-phone-number",
+    "otp",
+    "mcp-server",
     "smsbulk"
   ],
   "dependencies": {
