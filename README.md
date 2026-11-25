@@ -5,11 +5,32 @@ An AI-native **SMS + Email verification** [Model Context Protocol](https://model
 Desktop, Cursor, or any MCP-compatible client — browse the catalog, order
 verification numbers and disposable email addresses, and read back the codes.
 
-> Unlike SMS-only providers, SMSBulk exposes **both phone and email** OTP
-> verification through this server — the email tools (`email_*`) have no
-> equivalent in most competing MCP servers.
+> This server exposes **both phone and email** OTP verification: the `email_*`
+> tools order disposable addresses and read back the code, from the same
+> account and balance as the SMS tools.
 
 > **Status: experimental / v0.1.** The tool surface may change.
+
+## Coming from SMS-Activate or DaisySMS?
+
+Both services have closed (SMS-Activate states on its own site that it stopped
+operating on 22 December 2025; DaisySMS states it shut down on 26 March 2026).
+If you are moving an integration, you have two routes on SMSBulk:
+
+- **AI agents and MCP clients:** use this server. `request_number` →
+  `get_status` → `complete` covers the usual buy / poll / confirm loop.
+- **Existing scripts written for the SMS-Activate protocol:** SMSBulk has a
+  protocol-compatible endpoint for the balance, number, status, price, country
+  and rental actions (any other action returns `WRONG_ACTION`). The `country`
+  parameter accepts ISO codes or numeric IDs; the numeric IDs follow SMSBulk's
+  own table, so read them from the country action or send ISO codes. Details:
+  [smsbulk.net/docs/sms-activate](https://smsbulk.net/docs/sms-activate).
+
+Before you pick a replacement, look at delivery rather than the price list:
+SMSBulk publishes success rates by service and country at
+[smsbulk.net/success-rates](https://smsbulk.net/success-rates). Past rates do
+not determine future results. If no code arrives, the charge is refunded to
+your balance automatically.
 
 ## Features
 
@@ -17,8 +38,7 @@ verification numbers and disposable email addresses, and read back the codes.
   API key. No secrets stored, no other backend touched.
 - 📖 **Keyless catalog browsing.** List services and countries without a key.
 - 📱 **SMS verification.** Order numbers and read SMS codes.
-- 📧 **Email verification.** Order disposable addresses and read OTP/HTML — a
-  genuine differentiator vs SMS-only servers.
+- 📧 **Email verification.** Order disposable addresses and read OTP/HTML.
 - 🛟 **Best-effort retry guard** and an optional **soft spend cap** (see
   [Safety & limitations](#safety--limitations) — honestly scoped, not magic).
 
@@ -130,7 +150,7 @@ Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project):
 | `get_balance`       | —                  | Current wallet balance.                              |
 | `list_transactions` | `limit?`, `cursor?`| Recent deposits, debits, and refunds.                |
 
-### Email verification — API key required _(not available on SMS-only servers)_
+### Email verification — API key required
 
 | Tool                | Parameters                              | Description                                                            |
 | ------------------- | --------------------------------------- | ---------------------------------------------------------------------- |
@@ -190,7 +210,8 @@ When set, the server tracks the **real** cost of each successful order and
 - 🔑 API keys: [smsbulk.net/dashboard/api-keys](https://smsbulk.net/dashboard/api-keys)
 - 📱 SMS API docs: [smsbulk.net/docs/sms-activate](https://smsbulk.net/docs/sms-activate)
 - 📧 Email API docs: [smsbulk.net/docs/email-api](https://smsbulk.net/docs/email-api)
-- 📚 Interactive API reference (Swagger): [smsbulk.net/api/docs](https://smsbulk.net/api/docs)
+- 📚 API documentation: [smsbulk.net/docs](https://smsbulk.net/docs)
+- 📈 Success rates by service and country: [smsbulk.net/success-rates](https://smsbulk.net/success-rates)
 
 ## License
 
